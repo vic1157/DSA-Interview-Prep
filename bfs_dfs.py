@@ -1,5 +1,7 @@
 from collections import defaultdict, Counter
 
+from queue import deque
+
 # ------ Final Interview Question -----
 
 """
@@ -53,13 +55,13 @@ n: number of pairs in the input
 		# If it is, return True
 		# If it isn't, return False 
 
-pairs = [
+pairs1 = [
     (1, 3), (2, 3), (3, 6), (5, 6), (5, 7), (4, 5),
     (15, 21), (4, 8), (4, 9), (9, 11), (14, 4), (13, 12),
     (12, 9), (15, 13)
 ]
 
-# Success 
+# Helper Function Success 
 def createTree(list1):
 	hash1 = defaultdict(list)
 
@@ -67,7 +69,7 @@ def createTree(list1):
 		hash1[b].append(a)
 	return hash1
 
-#Success 
+# Helper Function Success (DFS)
 def treeDFS(tree, start, visited):
 	visited.append(start)
 	best_solution = visited
@@ -79,7 +81,23 @@ def treeDFS(tree, start, visited):
 				best_solution = candidate
 	return best_solution
 
-def hasCommonAncestor(avisited, bvisited):
+#Helper Function Success
+def treeBFS(tree, start):
+	queue = deque([start])
+	visited = [start]
+
+	while queue:
+		cnode = queue.popleft()
+
+		for nnode in tree[cnode]:
+			if nnode not in visited:
+				queue.append(nnode)
+				visited.append(nnode)
+	return visited
+				
+
+#Helper Function Success (DFS and BFS)
+def hasCommonAncestor1(avisited, bvisited):
 	if len(avisited) < len(bvisited) or len(avisited) == len(bvisited):
 		counter = len(avisited)-1
 		ref = avisited
@@ -94,24 +112,72 @@ def hasCommonAncestor(avisited, bvisited):
 			return True
 	return False
 
+# Scratch work is below
 '''
-hasCommonAncestor(pairs, 3, 8)   => false
-hasCommonAncestor(pairs, 5, 8)   => true
-hasCommonAncestor(pairs, 6, 8)   => true
-hasCommonAncestor(pairs, 6, 9)   => true
-hasCommonAncestor(pairs, 1, 3)   => false
-hasCommonAncestor(pairs, 3, 1)   => false
-hasCommonAncestor(pairs, 7, 11)  => true
-hasCommonAncestor(pairs, 6, 5)   => true
-hasCommonAncestor(pairs, 5, 6)   => true
-hasCommonAncestor(pairs, 3, 6)   => true
-hasCommonAncestor(pairs, 21, 11) => true
+#Tomorrow, come back and implement it like the synax above
+#tree1 = createTree(pairs)
+#aDFS1 = treeDFS(tree1, 3, [])
+#bDFS1 = treeDFS(tree1, 8, [])
+#print(aDFS1)
+#print(bDFS1)
+#print(hasCommonAncestor(avisited1, bvisited1))
+
+#aBFS2 = treeBFS(tree1, 3)
+#bBFS2 = treeBFS(tree1, 8)
+
+#print(aBFS2)
+#print(bBFS2)
 '''
 
+#Combining helper functions into one common function 
+#that is abstracted by other functions
+def hasCommonAncestor(pairs, a_node, b_node):
+	#Translate pairs in list into a tree
+	def createTree(list1):
+		hash1 = defaultdict(list)
 
-tree1 = createTree(pairs)
-avisited1 = treeDFS(tree1, 21, [])
-bvisited1 = treeDFS(tree1, 11, [])
-print(avisited1)
-print(bvisited1)
-print(hasCommonAncestor(avisited1, bvisited1))
+		for a, b in list1:
+			hash1[b].append(a)
+		return hash1
+	
+	# Execute BFS on both a_node and b_node
+	def treeBFS(tree, start):
+		queue = deque([start])
+		visited = [start]
+
+		while queue:
+			cnode = queue.popleft()
+
+			for nnode in tree[cnode]:
+				if nnode not in visited:
+					queue.append(nnode)
+					visited.append(nnode)
+		return visited
+	
+	# Compare the length of a and b visited arrays
+	def compareLen(avisited, bvisited):
+		if len(avisited) < len(bvisited) or len(avisited) == len(bvisited):
+			counter = len(avisited)-1
+			ref = avisited
+			check = bvisited
+		else:
+			counter = len(bvisited)-1
+			ref = bvisited
+			check = avisited
+	
+		for i in range(counter, 0, -1):
+			if ref[i] in check:
+				return True
+		return False
+
+
+	tree1 = createTree(pairs)
+	avisit = treeBFS(tree1, a_node)
+	bvisit = treeBFS(tree1, b_node)
+	return compareLen(avisit, bvisit)
+
+print(hasCommonAncestor(pairs1, 21, 11))
+
+# Key Insights
+	# 1) Translating the pairs into a tree made this problem significantly easier
+	# 2) Abstraction also made this problem easier to solve and debug

@@ -196,3 +196,263 @@ def isAnagram2(s: str, t: str):
 		# Hash Table (Counter) - 'Slower' but more space 
 	# Key Insight
 		# Again, for smaller strings, sorting may be the way to go because O(logn) < O(n) up to a certain value
+
+# -------- Problem 4 (Valid Anagram) ---------
+
+'''
+Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+You can return the answer in any order.
+
+Example 1: 
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+
+Example 2:
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
+
+Example 3:
+Input: nums = [3,3], target = 6
+Output: [0,1]
+
+'''
+
+# Pseduocode
+	# This problem is fairly simple:
+		# 1) Create a hash table to hold index elements as keys and indexes as values
+		# 2) After you interate through the nums array indexing every element,
+			#iterate over the hash map and subtract the element from the target value to find its complement
+		# 3) After you find the complement, check if it exists within the hashtable as a key
+			#if it does, return the value of both the current index and its corresponding complement
+
+nums1, target1 = [2,7,11,15], 9
+nums2, target2 = [3,2,4], 6
+nums3, target3 = [3,3], 6
+
+def twoSum(nums, target):
+	
+	if len(nums) == 2:
+		return [0, 1]
+	
+	hash1 = {}
+
+	for i in range(len(nums)):
+		hash1[nums[i]] = i
+
+	for num in hash1:
+		complement = target - num
+		if complement in hash1 and complement != num:
+			return [hash1[num], hash1[complement]]
+
+#print(twoSum(nums1, target1))
+#print(twoSum(nums2, target2))
+#print(twoSum(nums3, target3))
+
+# Key Insight
+	#You need to be cognizant of the base case an what it means implictly:
+		# a) If you have a list of two elements, the answer has to be 0,1
+		# b) Any list > len 2 has to have unique elements because this means that different elements would have different indexes, which would mess up the problem
+	# I was successful in solving the problem, the issue was I failed to recognize what the base case implied 
+
+
+# -------- Problem 5 (Group Anagrams) ---------
+
+'''
+Given an array of strings strs, group the anagrams together. You can return the answer in any order.
+
+An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+
+Example 1:
+Input: strs = ["eat","tea","tan","ate","nat","bat"]
+Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+
+Example 2:
+Input: strs = [""]
+Output: [[""]]
+
+Example 3:
+Input: strs = ["a"]
+Output: [["a"]]
+'''
+
+# Psuedocode 
+	#There's two approaches to this problem (convert the chars to all lowercase):
+		# 1) Utilizing the sorted() method
+		# 2) Utilizing the list analogous to a hash map 
+		# **Both approaches are similar with the difference being that the key selection is different
+	# Sorted Approach
+		# a) Take the sorted version of each string and append it its value (which will be a list)
+	# List 'HashMap'
+		# a) Create a list that has 26 indexes 
+		# b) Iterate over all of the chars in the str and take the unicode and offset it by 'a' unicode 
+		# c) Use this list as the key and append its value (which will be a list)
+	
+strs1 = ["eat","tea","tan","ate","nat","bat"]
+strs2 = [""]
+strs3 = ["a"]
+
+#Solution 1
+def isAnagram1(strs):
+	hash1 = defaultdict(list)
+
+	for word in strs:
+		word = word.lower()
+		sort = sorted(word)
+		hash1[tuple(sort)].append(word)
+	return hash1.values()
+
+#print(isAnagram1(strs1))
+#print(isAnagram1(strs2))
+#print(isAnagram1(strs3))
+
+#Solution 2
+def isAnagram2(strs):
+	hash1 = defaultdict(list)
+
+	for word in strs:
+		word = word.lower()
+		hasher = [0]*26
+		for char in word:
+			val = ord(char) - ord('a')
+			hasher[val] += 1
+		hash1[tuple(hasher)].append(word)
+	return hash1.values()
+			
+#print(isAnagram2(strs1))
+#print(isAnagram2(strs2))
+#print(isAnagram2(strs3))
+
+# Key Insight
+	# Understanding how to get each anagram to have a common 'key' is fundamental
+
+
+# -------- Problem 6 (Top K Elements in List) ---------
+
+'''
+Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.
+
+Example 1:
+Input: nums = [1,1,1,2,2,3], k = 2
+Output: [1,2]
+
+Example 2:
+Input: nums = [1], k = 1
+Output: [1]
+'''
+
+# Psuedocode
+	# There's two approaches that you can take
+		# a) Hash Table Counter
+		# b) Heapify
+	# Hash Table Counter
+		# Implement a hash table that takes the Counter of nums
+		# Sort hash1.values() to get most frequent elements at the end of the list
+		# Iterate over the hash table to see if the value mataches the key
+	# Heapify (I forgot how this went, lol)
+		# I need to study this algorithm again to let it stick
+		# After I study, I need to work on a practice problem to assess it again (NAH)
+
+nums1, k1 = [1,1,1,2,2,3], 2
+nums2, k2 = [1], 1
+
+
+# Solution 1 (Hash Table Counter)
+def topK(nums, k):
+	hash1 = Counter(nums)
+	sort = sorted(hash1, key=hash1.get)
+	return sort[-k::1]
+	
+#print(topK(nums1, k1))
+#print(topK(nums2, k2))
+
+#Key Insight
+	# Also forgot about the base case being ik len(nums) == k, then returning the entire nums array
+	# Understand that both max() and sorted() have 'key' parameters that allow you to organize the keys of the dictionary based on its values 
+
+# -------- Problem 7 (Encode & Decode Strings) ---------
+
+# I am now moving the questions to Notion because they're getting a bit long - I will leave the input/outputs and provide a summary of what the question is asking for:
+
+'''
+Summary:
+	The questions is asking you to implement a function that endcodes and another function that encodes a string
+
+Input/Output:
+
+	Example 1:
+
+	Input: dummy_input = ["Hello","World"]
+	Output: ["Hello","World"]
+
+	Explanation:
+	Machine 1:
+	Codec encoder = new Codec();
+	String msg = encoder.encode(strs);
+	Machine 1 ---msg---> Machine 2
+
+	Machine 2:
+	Codec decoder = new Codec();
+	String[] strs = decoder.decode(msg);
+
+
+	Example 2:
+
+	Input: dummy_input = [""]
+	Output: [""]
+'''
+
+
+'''
+Design an algorithm to encode a list of strings to a string. The encoded string is then sent over the network and is decoded back to the original list of strings.
+
+Machine 1 (sender) has the function:
+string encode(vector<string> strs) {
+  // ... your code
+  return encoded_string;
+}
+
+Machine 2 (receiver) has the function:
+vector<string> decode(string s) {
+  //... your code
+  return strs;
+}
+
+So Machine 1 does:
+string encoded_string = encode(strs);
+
+and Machine 2 does:
+vector<string> strs2 = decode(encoded_string);
+'''
+
+#Psuedocode
+	# I want to try offsetting each char in each word
+		# I think the issue the chars in this problem are case sensitive
+			# a) You should probably check if char isupper() and islower()
+				# If isupper(), offset by ord('A')
+				# If islower(), offset by ord('a')
+			# b) In addition, this problem didn't say that all characters would be alnum
+				# You need to check if isnumeric() - offset by ord('1')
+			# c) else (not alnum()) - offeset by ord('!')
+		# Literally, do the reverse when you're done for decode... 
+
+
+strs1 = ["Hello","World"]
+strs2 = [""]
+
+# Encodes a list of strings to a single string
+def encode(strs):
+	return '&'.join(strs)
+
+# Decods a single string to a list of strings 
+def decode(s):
+	return s.split('&')
+		
+encode = encode(strs1)
+print(encode)
+decode = decode(encode)
+print(decode)
+
